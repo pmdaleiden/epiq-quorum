@@ -73,7 +73,6 @@ class Main is Game, CollisionListener2D, KeyboardListener
         end
     end
 
-
     action Update(number seconds)
         cumTime = cumTime + seconds
         if cumTime > time
