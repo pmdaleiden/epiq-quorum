@@ -75,7 +75,8 @@ class Main is Game, CollisionListener2D, KeyboardListener
         ko:Load("media/kobad.jpg")
         steve:Load("media/stevebad.jpg")
         sina:Load("media/sinabad.jpg")
-        
+        sina:Scale(0.5)
+
         Add(hero)
         Add(target)
         Add(castle)
@@ -89,7 +90,11 @@ class Main is Game, CollisionListener2D, KeyboardListener
         number cumFloor = 0
         repeat 10 times
             Drawable newFloorPiece
-            newFloorPiece:LoadFilledRectangle(r:RandomIntegerBetween(groundWidthMin, groundWidthMax), 100, c:Green())
+            if ground:GetSize() = 9
+                newFloorPiece:LoadFilledRectangle(800, 100, c:Green())
+            else
+                newFloorPiece:LoadFilledRectangle(r:RandomIntegerBetween(groundWidthMin, groundWidthMax), 100, c:Green())
+            end
             newFloorPiece:SetCollidable(true)
             newFloorPiece:SetPosition(cumFloor, 0)            
             cumFloor = cumFloor + newFloorPiece:GetWidth() + pitWidth
