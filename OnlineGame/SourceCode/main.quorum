@@ -21,6 +21,7 @@ class Main is Game, CollisionListener2D
     integer xSpeed = 100
     integer ySpeed = 100
     integer score = 0
+    integer circleRadius = 10
 
     number time = 0
     number cumTime = 0
@@ -32,7 +33,7 @@ class Main is Game, CollisionListener2D
     end
 
     action CreateGame
-        circle:LoadFilledCircle(10)
+        circle:LoadFilledCircle(circleRadius)
         target:LoadFilledRectangle(30, 30, c:Red())
         target:SetPosition(400, 300)
         circle:SetCollidable(true)
@@ -63,21 +64,37 @@ class Main is Game, CollisionListener2D
             xSpeed = r:RandomIntegerBetween(-targetSpeed, targetSpeed)
             newX = target:GetX() + seconds * xSpeed
         end
-        repeat while newX < 0 and newY > 800
+        repeat while newY < 0 and newY > 800
             ySpeed = r:RandomIntegerBetween(-targetSpeed, targetSpeed)
             newY = target:GetY() + seconds * ySpeed
         end
         target:SetX(newX)
         target:SetY(newY)
+        number x = circle:GetX()
+        number y = circle:GetY()
         if monitor:IsKeyPressed(keys:RIGHT)
-            circle:SetX(circle:GetX() + seconds * speed)
+            x = x + seconds * speed
+            if x > (800 - circleRadius * 2)
+                x = 800 - circleRadius * 2
+            end
         elseif monitor:IsKeyPressed(keys:LEFT)
-            circle:SetX(circle:GetX() - seconds * speed)
+            x = x - seconds * speed
+            if x < 0
+                x = 0
+            end
         elseif monitor:IsKeyPressed(keys:UP)
-            circle:SetY(circle:GetY() + seconds * speed)
+            y = y + seconds * speed
+            if y > (600 - circleRadius * 2)
+                y = 600 - circleRadius * 2
+            end
         elseif monitor:IsKeyPressed(keys:DOWN)
-            circle:SetY(circle:GetY() - seconds * speed)
+            y = y - seconds * speed
+            if y < 0
+                y = 0
+            end
         end
+        circle:SetX(x)
+        circle:SetY(y)
         if monitor:IsKeyPressed(keys:SPACE)
             if pressed = false
                 integer xDiff = cast(integer, target:GetX() - circle:GetX())
