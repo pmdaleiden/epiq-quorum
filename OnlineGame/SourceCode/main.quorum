@@ -4,30 +4,38 @@ use Libraries.Game.InputMonitor
 use Libraries.Interface.Events.KeyboardEvent
 
 class Main is Game
-    Drawable box
+    Drawable circle
     InputMonitor monitor
     KeyboardEvent keys
     integer speed = 200
-
+    boolean pressed = false
 
     action Main
         StartGame()
     end
 
     action CreateGame
-        box:LoadFilledCircle(10)
-        Add(box)
+        circle:LoadFilledCircle(10)
+        Add(circle)
     end
 
     action Update(number seconds)
         if monitor:IsKeyPressed(keys:RIGHT)
-            box:SetX(box:GetX() + seconds * speed)
+            circle:SetX(circle:GetX() + seconds * speed)
         elseif monitor:IsKeyPressed(keys:LEFT)
-            box:SetX(box:GetX() - seconds * speed)
+            circle:SetX(circle:GetX() - seconds * speed)
         elseif monitor:IsKeyPressed(keys:UP)
-            box:SetY(box:GetY() + seconds * speed)
+            circle:SetY(circle:GetY() + seconds * speed)
         elseif monitor:IsKeyPressed(keys:DOWN)
-            box:SetY(box:GetY() - seconds * speed)
+            circle:SetY(circle:GetY() - seconds * speed)
+        end
+        if monitor:IsKeyPressed(keys:SPACE)
+            if pressed = false
+                output "Position: (" + circle:GetX() + "," + circle:GetY() + ")"
+                pressed = true
+            end
+        else
+            pressed = false
         end
     end
 end
