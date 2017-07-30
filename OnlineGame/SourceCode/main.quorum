@@ -77,7 +77,7 @@ class Main is Game, CollisionListener2D, KeyboardListener
         ko:SetPosition(150, 200)
         steve:Load("media/stevebad.jpg")
         steve:SetPosition(250, 200)
-        sina:Load("media/sina.jpg")
+        sina:Load("media/sinabad.jpg")
         sina:SetPosition(300, 200)
         
         Add(hero)
