@@ -57,6 +57,7 @@ class Main is Game, CollisionListener2D, KeyboardListener
         //A little adorable royalty free music piece available 
         //here: http://www.bensound.com/royalty-free-music/track/cute
         music:Load("media/bensound-cute.ogg")
+        music:SetVolume(0.5)
         music:EnableLooping()
         music:Play()
 
@@ -73,6 +74,7 @@ class Main is Game, CollisionListener2D, KeyboardListener
         if event:keyCode = event:SPACE
             inJump = true
             cumJumpTime = 0
+            jump:Play()
         end
     end
 
