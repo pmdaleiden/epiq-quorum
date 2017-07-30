@@ -15,7 +15,6 @@ class Main is Game, CollisionListener2D
     InputMonitor monitor
     KeyboardEvent keys
     Random r
-    Math m
 
     integer speed = 200
     integer targetSpeed = 100
@@ -25,8 +24,6 @@ class Main is Game, CollisionListener2D
 
     number time = 0
     number cumTime = 0
-    number positionTime = 2
-    number cumPositionTime = 0
     
     boolean pressed = false
 
@@ -49,32 +46,26 @@ class Main is Game, CollisionListener2D
     action BeginCollision(CollisionEvent2D e)
         score = score + 1
         output "Score: " + score
+        circle:SetPosition(0,0)
     end
 
     action Update(number seconds)
         cumTime = cumTime + seconds
-        cumPositionTime = cumPositionTime + seconds
         if cumTime > time
             cumTime = 0
             time = r:RandomNumber()
             xSpeed = r:RandomIntegerBetween(-targetSpeed, targetSpeed)
             ySpeed = r:RandomIntegerBetween(-targetSpeed, targetSpeed)
         end
-        if cumPositionTime > positionTime
-            cumPositionTime = 0
-            number xDiff = m:Round(target:GetX() - circle:GetX(), 0)
-            number yDiff = m:Round(target:GetY() - circle:GetY(), 0)
-            output xDiff + " " + yDiff
-        end
         number newX = target:GetX() + seconds * xSpeed
-        number newY = target:GetY() + seconds * xSpeed
+        number newY = target:GetY() + seconds * ySpeed
         repeat while newX < 0 and newX > 600
             xSpeed = r:RandomIntegerBetween(-targetSpeed, targetSpeed)
             newX = target:GetX() + seconds * xSpeed
         end
         repeat while newX < 0 and newY > 800
             ySpeed = r:RandomIntegerBetween(-targetSpeed, targetSpeed)
-            newY = target:GetY() + seconds * xSpeed
+            newY = target:GetY() + seconds * ySpeed
         end
         target:SetX(newX)
         target:SetY(newY)
@@ -89,8 +80,8 @@ class Main is Game, CollisionListener2D
         end
         if monitor:IsKeyPressed(keys:SPACE)
             if pressed = false
-                number xDiff = m:Round(target:GetX() - circle:GetX(), 0)
-                number yDiff = m:Round(target:GetY() - circle:GetY(), 0)
+                integer xDiff = cast(integer, target:GetX() - circle:GetX())
+                integer yDiff = cast(integer, target:GetY() - circle:GetY())
                 output xDiff + " " + yDiff
                 pressed = true
             end
