@@ -7,6 +7,7 @@ use Libraries.Compute.Random
 use Libraries.Interface.Events.CollisionListener2D
 use Libraries.Interface.Events.CollisionEvent2D
 use Libraries.Compute.Math
+use Libraries.Sound.Audio
 
 class Main is Game, CollisionListener2D
     Drawable circle
@@ -28,6 +29,7 @@ class Main is Game, CollisionListener2D
     number cumTime = 0
     
     boolean pressed = false
+    Audio audio
 
     action Main
         StartGame()
@@ -43,6 +45,12 @@ class Main is Game, CollisionListener2D
         Add(target)
         time = r:RandomNumber()
         AddCollisionListener(me)
+
+        //A little adorable royalty free music piece available 
+        //here: http://www.bensound.com/royalty-free-music/track/cute
+        audio:Load("media/bensound-cute.ogg")
+        audio:EnableLooping()
+        audio:Play()
     end
 
     action BeginCollision(CollisionEvent2D e)
