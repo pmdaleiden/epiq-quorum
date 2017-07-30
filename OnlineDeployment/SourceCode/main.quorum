@@ -26,8 +26,27 @@ assertivePre:AddAttribute("aria-atomic", "true")
 assertivePre:AddAttribute("aria-label", "output of Development Environment")
 assertivePre:AddAttribute("aria-live", "assertive")
 assertivePre:AddAttribute("aria-relevant", "additions")
+assertivePre:SetIdentifier("IdeOutput")
 page:Add(assertivePre)
+
+Script accessibilityOutput
+accessibilityOutput:SetAddress("output.js")
+page:Add(accessibilityOutput)
 
 File file
 file:SetPath("Run/index.html")
 file:Write(page:Generate())
+
+File outputCopy
+outputCopy:SetPath("output.js")
+
+File outputCopyNewLocation
+outputCopyNewLocation:SetPath("Run/output.js")
+outputCopy:Copy(outputCopyNewLocation)
+
+File game
+game:SetPath("../OnlineGame/Run/run.js")
+
+File newGame
+newGame:SetPath("Run/run.js")
+game:Copy(newGame)
