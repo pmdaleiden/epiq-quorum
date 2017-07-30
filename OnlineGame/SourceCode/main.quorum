@@ -22,6 +22,7 @@ class Main is Game, CollisionListener2D
     integer ySpeed = 100
     integer score = 0
     integer circleRadius = 10
+    integer targetSize = 30
 
     number time = 0
     number cumTime = 0
@@ -34,7 +35,7 @@ class Main is Game, CollisionListener2D
 
     action CreateGame
         circle:LoadFilledCircle(circleRadius)
-        target:LoadFilledRectangle(30, 30, c:Red())
+        target:LoadFilledRectangle(targetSize, targetSize, c:Red())
         target:SetPosition(400, 300)
         circle:SetCollidable(true)
         target:SetCollidable(true)
@@ -60,13 +61,11 @@ class Main is Game, CollisionListener2D
         end
         number newX = target:GetX() + seconds * xSpeed
         number newY = target:GetY() + seconds * ySpeed
-        repeat while newX < 0 and newX > 600
-            xSpeed = r:RandomIntegerBetween(-targetSpeed, targetSpeed)
-            newX = target:GetX() + seconds * xSpeed
+        if newX < targetSize or newX > 800 - targetSize
+            xSpeed = -xSpeed
         end
-        repeat while newY < 0 and newY > 800
-            ySpeed = r:RandomIntegerBetween(-targetSpeed, targetSpeed)
-            newY = target:GetY() + seconds * ySpeed
+        if newY < targetSize or newY > 600 - targetSize
+            ySpeed = -ySpeed
         end
         target:SetX(newX)
         target:SetY(newY)
@@ -91,6 +90,20 @@ class Main is Game, CollisionListener2D
             y = y - seconds * speed
             if y < 0
                 y = 0
+            end
+        elseif monitor:IsKeyPressed(keys:EQUALS)
+            if targetSpeed > 0
+                targetSpeed = targetSpeed + 20
+            else
+                targetSpeed = targetSpeed - 20
+            end
+        elseif monitor:IsKeyPressed(keys:MINUS)
+            if targetSpeed = 0
+                targetSpeed = 0
+            elseif targetSpeed > 0
+                targetSpeed = targetSpeed - 20
+            else
+                targetSpeed = targetSpeed + 20
             end
         end
         circle:SetX(x)
