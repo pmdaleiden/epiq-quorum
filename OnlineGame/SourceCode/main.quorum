@@ -8,6 +8,7 @@ use Libraries.Interface.Events.CollisionListener2D
 use Libraries.Interface.Events.CollisionEvent2D
 use Libraries.Compute.Math
 use Libraries.Interface.Events.KeyboardListener
+use Libraries.Sound.Audio
 
 class Main is Game, CollisionListener2D, KeyboardListener
     Drawable circle
@@ -24,15 +25,16 @@ class Main is Game, CollisionListener2D, KeyboardListener
     integer score = 0
     integer circleRadius = 10
     integer targetSize = 30
+    integer jumpSpeed = 50
 
     number time = 0
     number cumTime = 0
-    
-
-    boolean inJump = false
     number jumpTime = 1.0
     number cumJumpTime = 0
-    integer jumpSpeed = 50
+    
+    boolean inJump = false
+
+    Audio audio
 
     action Main
         StartGame()
@@ -49,6 +51,12 @@ class Main is Game, CollisionListener2D, KeyboardListener
         time = r:RandomNumber()
         AddCollisionListener(me)
         AddKeyboardListener(me)
+
+        //A little adorable royalty free music piece available 
+        //here: http://www.bensound.com/royalty-free-music/track/cute
+        audio:Load("media/bensound-cute.ogg")
+        audio:EnableLooping()
+        audio:Play()
     end
 
     action BeginCollision(CollisionEvent2D e)
