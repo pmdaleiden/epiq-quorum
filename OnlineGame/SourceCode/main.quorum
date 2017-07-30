@@ -16,6 +16,10 @@ use Libraries.Interface.Item2D
 class Main is Game, CollisionListener2D, KeyboardListener
     Drawable hero
     Drawable target
+    Drawable castle
+    Drawable ko
+    Drawable steve
+    Drawable sina
     Array<Drawable> ground
     Array<Drawable> coins
     Color c
@@ -72,8 +76,21 @@ class Main is Game, CollisionListener2D, KeyboardListener
         target:SetPosition(400, 300)
         hero:SetCollidable(true)
         target:SetCollidable(true)
+        castle:Load("media/castle.jpg")
+        castle:SetPosition(300, 100)
+        ko:Load("media/kobad.jpg")
+        ko:SetPosition(150, 200)
+        steve:Load("media/stevebad.jpg")
+        steve:SetPosition(250, 200)
+        sina:Load("media/sinabad.jpg")
+        sina:SetPosition(300, 200)
+        
         Add(hero)
         Add(target)
+        Add(castle)
+        Add(ko)
+        Add(steve)
+        Add(sina)
         time = r:RandomNumber()
         AddCollisionListener(me)
         AddKeyboardListener(me)
