@@ -2,6 +2,8 @@ use Libraries.Web.Page.WebPage
 use Libraries.System.File
 use Libraries.Web.Page.Canvas
 use Libraries.Web.Page.Script
+use Libraries.Web.Page.PreformattedText
+
 WebPage page
 
 Canvas drawHere
@@ -16,6 +18,15 @@ page:Add(script)
 Script code
 code:SetAddress("run.js")
 page:Add(code)
+
+//aria-atomic= "true" aria-label= "output of Development Environment" aria-live= "assertive" aria-relevant="additions"
+PreformattedText assertivePre
+assertivePre:AddAttribute("role", "region")
+assertivePre:AddAttribute("aria-atomic", "true")
+assertivePre:AddAttribute("aria-label", "output of Development Environment")
+assertivePre:AddAttribute("aria-live", "assertive")
+assertivePre:AddAttribute("aria-relevant", "additions")
+page:Add(assertivePre)
 
 File file
 file:SetPath("Run/index.html")
