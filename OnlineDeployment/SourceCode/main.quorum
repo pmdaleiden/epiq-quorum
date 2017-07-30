@@ -2,6 +2,8 @@ use Libraries.Web.Page.WebPage
 use Libraries.System.File
 use Libraries.Web.Page.Canvas
 use Libraries.Web.Page.Script
+use Libraries.Web.Page.PreformattedText
+
 WebPage page
 
 Canvas drawHere
@@ -17,6 +19,34 @@ Script code
 code:SetAddress("run.js")
 page:Add(code)
 
+//aria-atomic= "true" aria-label= "output of Development Environment" aria-live= "assertive" aria-relevant="additions"
+PreformattedText assertivePre
+assertivePre:AddAttribute("role", "region")
+assertivePre:AddAttribute("aria-atomic", "true")
+assertivePre:AddAttribute("aria-label", "output of Development Environment")
+assertivePre:AddAttribute("aria-live", "assertive")
+assertivePre:AddAttribute("aria-relevant", "additions")
+assertivePre:SetIdentifier("IdeOutput")
+page:Add(assertivePre)
+
+Script accessibilityOutput
+accessibilityOutput:SetAddress("output.js")
+page:Add(accessibilityOutput)
+
 File file
 file:SetPath("Run/index.html")
 file:Write(page:Generate())
+
+File outputCopy
+outputCopy:SetPath("output.js")
+
+File outputCopyNewLocation
+outputCopyNewLocation:SetPath("Run/output.js")
+outputCopy:Copy(outputCopyNewLocation)
+
+File game
+game:SetPath("../OnlineGame/Run/run.js")
+
+File newGame
+newGame:SetPath("Run/run.js")
+game:Copy(newGame)
