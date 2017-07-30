@@ -22,6 +22,8 @@ class Main is Game, CollisionListener2D, KeyboardListener
     Drawable sina
     Array<Drawable> ground
     Array<Drawable> coins
+    Drawable bird
+    Drawable toxicBirdCrap
     Color c
     InputMonitor monitor
     KeyboardEvent keys
@@ -40,6 +42,7 @@ class Main is Game, CollisionListener2D, KeyboardListener
     integer groundWidthMax = 400
     integer groundSpeed = 50
     integer pitWidth = 60
+    integer counter = 0
 
     number time = 0
     number cumTime = 0
@@ -72,6 +75,7 @@ class Main is Game, CollisionListener2D, KeyboardListener
         end
         hero:Load("media/Caffeine.png")
         hero:SetPosition(0, 100)
+        hero:Scale(0.3)
         target:LoadFilledRectangle(targetSize, targetSize, c:Red())
         target:SetPosition(400, 300)
         hero:SetCollidable(true)
@@ -85,6 +89,17 @@ class Main is Game, CollisionListener2D, KeyboardListener
         sina:Load("media/sinabad.jpg")
         sina:SetPosition(300, 200)
         
+        bird:LoadFilledTriangle(0,0,20,60,40,0)
+        bird:SetPosition(0, 550)
+        bird:Rotate(90)
+
+        number arrayNamesCounter = 0
+
+        toxicBirdCrap:LoadFilledTriangle(0,0,10,10, 20, 0, c:CustomColor(1, 0.5, 0.5, 1))
+        toxicBirdCrap:SetPosition(0, 100000)
+        Add(toxicBirdCrap)
+
+        bird:SetCollidable(true)
         Add(hero)
         Add(target)
         Add(castle)
@@ -202,6 +217,13 @@ class Main is Game, CollisionListener2D, KeyboardListener
                 hero:SetY(hero:GetY() - seconds * jumpSpeed)
             end
         end
+
+        number newBirdX = bird:GetX() + 50 * seconds
+        bird:SetX(newBirdX)
+
+        number newBirdCrapY = toxicBirdCrap:GetY() - 400 * seconds
+        toxicBirdCrap:SetY(newBirdCrapY)
+
         Iterator<Drawable> it = ground:GetIterator()
         repeat while it:HasNext()
             Drawable floorPiece = it:Next()
