@@ -9,10 +9,12 @@ use Libraries.Interface.Events.CollisionEvent2D
 use Libraries.Compute.Math
 use Libraries.Interface.Events.KeyboardListener
 use Libraries.Sound.Audio
+use Libraries.Containers.Array
 
 class Main is Game, CollisionListener2D, KeyboardListener
     Drawable circle
     Drawable target
+    Array<Drawable> coins
     Color c
     InputMonitor monitor
     KeyboardEvent keys
@@ -42,6 +44,15 @@ class Main is Game, CollisionListener2D, KeyboardListener
     end
 
     action CreateGame
+
+        i = 0
+        repeat 10 times
+            Drawable coin
+            coin:Load("media/QCoin.png")
+            coins:Add(coin)
+            Add(coin)
+            i = i + 1
+        end
         circle:Load("media/Caffeine.png")
         circle:SetPosition(0, 100)
         target:LoadFilledRectangle(targetSize, targetSize, c:Red())
