@@ -1,0 +1,22 @@
+use Libraries.Web.Page.WebPage
+use Libraries.System.File
+use Libraries.Web.Page.Canvas
+use Libraries.Web.Page.Script
+WebPage page
+
+Canvas drawHere
+drawHere:SetTabIndex("0")
+drawHere:SetIdentifier("QuorumGraphicsCanvas")
+page:Add(drawHere)
+
+Script script
+script:SetCode("var canvas = document.getElementById('QuorumGraphicsCanvas'); canvas.width = 800; canvas.height = 600;")
+page:Add(script)
+
+Script code
+code:SetAddress("run.js")
+page:Add(code)
+
+File file
+file:SetPath("Run/index.html")
+file:Write(page:Generate())
