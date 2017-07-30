@@ -6,6 +6,7 @@ use Libraries.Game.Graphics.Color
 use Libraries.Compute.Random
 use Libraries.Interface.Events.CollisionListener2D
 use Libraries.Interface.Events.CollisionEvent2D
+use Libraries.Compute.Math
 
 class Main is Game, CollisionListener2D
     Drawable circle
@@ -14,6 +15,8 @@ class Main is Game, CollisionListener2D
     InputMonitor monitor
     KeyboardEvent keys
     Random r
+    Math m
+
     integer speed = 200
     integer targetSpeed = 100
     integer xSpeed = 100
@@ -22,6 +25,9 @@ class Main is Game, CollisionListener2D
 
     number time = 0
     number cumTime = 0
+    number positionTime = 2
+    number cumPositionTime = 0
+    
     boolean pressed = false
 
     action Main
@@ -47,13 +53,19 @@ class Main is Game, CollisionListener2D
 
     action Update(number seconds)
         cumTime = cumTime + seconds
+        cumPositionTime = cumPositionTime + seconds
         if cumTime > time
             cumTime = 0
             time = r:RandomNumber()
             xSpeed = r:RandomIntegerBetween(-targetSpeed, targetSpeed)
             ySpeed = r:RandomIntegerBetween(-targetSpeed, targetSpeed)
         end
-
+        if cumPositionTime > positionTime
+            cumPositionTime = 0
+            number xDiff = m:Round(target:GetX() - circle:GetX(), 0)
+            number yDiff = m:Round(target:GetY() - circle:GetY(), 0)
+            output xDiff + " " + yDiff
+        end
         number newX = target:GetX() + seconds * xSpeed
         number newY = target:GetY() + seconds * xSpeed
         repeat while newX < 0 and newX > 600
@@ -77,7 +89,9 @@ class Main is Game, CollisionListener2D
         end
         if monitor:IsKeyPressed(keys:SPACE)
             if pressed = false
-                output "Score: " + score
+                number xDiff = m:Round(target:GetX() - circle:GetX(), 0)
+                number yDiff = m:Round(target:GetY() - circle:GetY(), 0)
+                output xDiff + " " + yDiff
                 pressed = true
             end
         else
