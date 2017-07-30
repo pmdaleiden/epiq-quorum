@@ -15,7 +15,7 @@ class Main is Game
     end
 
     action CreateGame
-        box:Load("sina.jpeg")
+        box:LoadFilledCircle(10)
         Add(box)
     end
 
