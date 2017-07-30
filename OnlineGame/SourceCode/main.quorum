@@ -75,8 +75,6 @@ class Main is Game, CollisionListener2D, KeyboardListener
         ko:Load("media/kobad.jpg")
         steve:Load("media/stevebad.jpg")
         sina:Load("media/sinabad.jpg")
-        sina:Scale(0.50)
-        
         
         Add(hero)
         Add(target)
