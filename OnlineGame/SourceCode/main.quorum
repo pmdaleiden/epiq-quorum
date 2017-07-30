@@ -42,7 +42,7 @@ class Main is Game, CollisionListener2D, KeyboardListener
     end
 
     action CreateGame
-        circle:LoadFilledCircle(circleRadius)
+        circle:Load("media/Caffeine.png")
         circle:SetPosition(0, 100)
         target:LoadFilledRectangle(targetSize, targetSize, c:Red())
         target:SetPosition(400, 300)
