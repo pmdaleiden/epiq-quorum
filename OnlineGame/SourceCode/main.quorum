@@ -38,11 +38,11 @@ class Main is Game, CollisionListener2D, KeyboardListener
     integer targetSize = 30
     integer jumpSpeed = 150
     integer groundHeight = 100
-    integer groundWidthMin = 100
+    integer groundWidthMin = 150
     integer groundWidthMax = 400
     integer groundSpeed = 50
-    integer pitWidth = 60
     integer counter = 0
+    integer pitWidth = 100
 
     number time = 0
     number cumTime = 0
@@ -81,11 +81,8 @@ class Main is Game, CollisionListener2D, KeyboardListener
         hero:SetCollidable(true)
         target:SetCollidable(true)
         castle:Load("media/castle.jpg")
-        castle:SetPosition(300, 100)
         ko:Load("media/kobad.jpg")
-        ko:SetPosition(150, 200)
         steve:Load("media/stevebad.jpg")
-        steve:SetPosition(250, 200)
         sina:Load("media/sinabad.jpg")
         sina:SetPosition(300, 200)
         
@@ -100,6 +97,7 @@ class Main is Game, CollisionListener2D, KeyboardListener
         Add(toxicBirdCrap)
 
         bird:SetCollidable(true)
+        sina:Scale(0.5)
         Add(hero)
         Add(target)
         Add(castle)
@@ -113,13 +111,26 @@ class Main is Game, CollisionListener2D, KeyboardListener
         number cumFloor = 0
         repeat 10 times
             Drawable newFloorPiece
-            newFloorPiece:LoadFilledRectangle(r:RandomIntegerBetween(groundWidthMin, groundWidthMax), 100, c:Green())
+            if ground:GetSize() = 9
+                newFloorPiece:LoadFilledRectangle(800, 100, c:Green())
+            else
+                newFloorPiece:LoadFilledRectangle(r:RandomIntegerBetween(groundWidthMin, groundWidthMax), 100, c:Green())
+            end
             newFloorPiece:SetCollidable(true)
             newFloorPiece:SetPosition(cumFloor, 0)            
             cumFloor = cumFloor + newFloorPiece:GetWidth() + pitWidth
             Add(newFloorPiece)
             ground:AddToEnd(newFloorPiece)
+            if ground:GetSize() = 3
+                ko:SetPosition(cumFloor - pitWidth - ko:GetWidth(), 100)
+            end
+            if ground:GetSize() = 6
+                steve:SetPosition(cumFloor - pitWidth - steve:GetWidth(), 100)
+            end
         end
+        castle:SetPosition(cumFloor - pitWidth - castle:GetWidth(), 100)
+        sina:SetPosition(castle:GetX() - sina:GetWidth(), 100)
+        
 
         //winning music: http://www.bensound.com/royalty-free-music/track/badass
 
@@ -235,5 +246,9 @@ class Main is Game, CollisionListener2D, KeyboardListener
                 floorPiece:SetX(itemX)
             end
         end
+        castle:SetX(castle:GetX() - seconds * groundSpeed)
+        sina:SetX(sina:GetX() - seconds * groundSpeed)
+        ko:SetX(ko:GetX() - seconds * groundSpeed)
+        steve:SetX(steve:GetX() - seconds * groundSpeed)
     end
 end
