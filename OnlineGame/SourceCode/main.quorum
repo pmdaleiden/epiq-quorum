@@ -7,8 +7,9 @@ use Libraries.Compute.Random
 use Libraries.Interface.Events.CollisionListener2D
 use Libraries.Interface.Events.CollisionEvent2D
 use Libraries.Compute.Math
+use Libraries.Interface.Events.KeyboardListener
 
-class Main is Game, CollisionListener2D
+class Main is Game, CollisionListener2D, KeyboardListener
     Drawable circle
     Drawable target
     Color c
@@ -27,7 +28,11 @@ class Main is Game, CollisionListener2D
     number time = 0
     number cumTime = 0
     
-    boolean pressed = false
+
+    boolean inJump = false
+    number jumpTime = 1.0
+    number cumJumpTime = 0
+    integer jumpSpeed = 50
 
     action Main
         StartGame()
@@ -43,6 +48,7 @@ class Main is Game, CollisionListener2D
         Add(target)
         time = r:RandomNumber()
         AddCollisionListener(me)
+        AddKeyboardListener(me)
     end
 
     action BeginCollision(CollisionEvent2D e)
@@ -50,6 +56,14 @@ class Main is Game, CollisionListener2D
         output "Score: " + score
         circle:SetPosition(0,0)
     end
+
+    action PressedKey(KeyboardEvent event)
+        if event:keyCode = event:SPACE
+            inJump = true
+            cumJumpTime = 0
+        end
+    end
+
 
     action Update(number seconds)
         cumTime = cumTime + seconds
@@ -82,15 +96,12 @@ class Main is Game, CollisionListener2D
                 x = 0
             end
         elseif monitor:IsKeyPressed(keys:UP)
-            y = y + seconds * speed
-            if y > (600 - circleRadius * 2)
-                y = 600 - circleRadius * 2
+            if inJump = false
+                cumJumpTime = 0
+                inJump = true
             end
         elseif monitor:IsKeyPressed(keys:DOWN)
-            y = y - seconds * speed
-            if y < 0
-                y = 0
-            end
+            
         elseif monitor:IsKeyPressed(keys:EQUALS)
             if targetSpeed > 0
                 targetSpeed = targetSpeed + 20
@@ -106,17 +117,22 @@ class Main is Game, CollisionListener2D
                 targetSpeed = targetSpeed + 20
             end
         end
+        if inJump
+            cumJumpTime = cumJumpTime + seconds
+            if cumJumpTime < jumpTime * 0.40
+            //move y up
+                y = circle:GetY() + seconds * jumpSpeed
+            elseif cumJumpTime < jumpTime * 0.60
+            //pause at the top of the jump
+            elseif cumJumpTime < jumpTime
+            // move y down
+                y = circle:GetY() - seconds * jumpSpeed
+            else
+            // jump ended
+                inJump = false
+            end
+        end
         circle:SetX(x)
         circle:SetY(y)
-        if monitor:IsKeyPressed(keys:SPACE)
-            if pressed = false
-                integer xDiff = cast(integer, target:GetX() - circle:GetX())
-                integer yDiff = cast(integer, target:GetY() - circle:GetY())
-                output xDiff + " " + yDiff
-                pressed = true
-            end
-        else
-            pressed = false
-        end
     end
 end
