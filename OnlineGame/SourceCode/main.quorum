@@ -98,7 +98,9 @@ class Main is Game, CollisionListener2D
                 targetSpeed = targetSpeed - 20
             end
         elseif monitor:IsKeyPressed(keys:MINUS)
-            if targetSpeed > 0
+            if targetSpeed = 0
+                targetSpeed = 0
+            elseif targetSpeed > 0
                 targetSpeed = targetSpeed - 20
             else
                 targetSpeed = targetSpeed + 20
