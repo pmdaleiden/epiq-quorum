@@ -11,6 +11,7 @@ use Libraries.Interface.Events.KeyboardListener
 use Libraries.Sound.Audio
 use Libraries.Containers.Array
 use Libraries.Containers.Iterator
+use Libraries.Interface.Item2D
 
 class Main is Game, CollisionListener2D, KeyboardListener
     Drawable hero
@@ -45,23 +46,27 @@ class Main is Game, CollisionListener2D, KeyboardListener
 
     Audio music
     Audio jump
+    Audio cash
+    Audio fart
 
     action Main
         StartGame()
     end
 
     action CreateGame
-
+        hero:SetName("hero")
         i = 1
         repeat 10 times
             Drawable coin
             coin:Load("media/QCoin.png")
-            coin:SetPosition(i * 70, 200)
+            coin:SetPosition(i * 150, 200)
             coin:SetCollidable(true)
             coins:Add(coin)
+            coin:SetName("coin")
             Add(coin)
+            i = i + 1
         end
-        hero:LoadFilledCircle(heroRadius)
+        hero:Load("media/Caffeine.png")
         hero:SetPosition(0, 100)
         target:LoadFilledRectangle(targetSize, targetSize, c:Red())
         target:SetPosition(400, 300)
@@ -94,12 +99,19 @@ class Main is Game, CollisionListener2D, KeyboardListener
         music:SetVolume(0.5)
         music:EnableLooping()
         music:Play()
-
+        cash:Load("media/cash.ogg")
         jump:Load("media/fart.ogg")
     end
 
     action BeginCollision(CollisionEvent2D e)
         inJump = false
+
+        Item2D a = e:GetItemA()
+        Item2D b = e:GetItemB()
+        if a:GetName() = "hero" and b:GetName() = "coin" or
+           a:GetName() = "coin" and b:GetName() = "hero"
+           cash:Play()
+        end
     end
 
     action PressedKey(KeyboardEvent event)
@@ -110,6 +122,7 @@ class Main is Game, CollisionListener2D, KeyboardListener
                 if hero:GetX() < groundHeight
                     output "you die"
                 end
+                jump:Play()
             end
         end
     end
