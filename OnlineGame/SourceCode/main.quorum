@@ -35,10 +35,10 @@ class Main is Game, CollisionListener2D, KeyboardListener
     integer targetSize = 30
     integer jumpSpeed = 150
     integer groundHeight = 100
-    integer groundWidthMin = 100
+    integer groundWidthMin = 150
     integer groundWidthMax = 400
     integer groundSpeed = 50
-    integer pitWidth = 60
+    integer pitWidth = 100
 
     number time = 0
     number cumTime = 0
@@ -72,7 +72,6 @@ class Main is Game, CollisionListener2D, KeyboardListener
         hero:SetCollidable(true)
         target:SetCollidable(true)
         castle:Load("media/castle.jpg")
-        castle:SetPosition(300, 100)
         ko:Load("media/kobad.jpg")
         ko:SetPosition(150, 200)
         steve:Load("media/stevebad.jpg")
@@ -100,6 +99,8 @@ class Main is Game, CollisionListener2D, KeyboardListener
             Add(newFloorPiece)
             ground:AddToEnd(newFloorPiece)
         end
+        castle:SetPosition(cumFloor - pitWidth - castle:GetWidth(), 100)
+        
 
         //winning music: http://www.bensound.com/royalty-free-music/track/badass
 
@@ -200,5 +201,6 @@ class Main is Game, CollisionListener2D, KeyboardListener
                 floorPiece:SetX(itemX)
             end
         end
+        castle:SetX(castle:GetX() - seconds * groundSpeed)
     end
 end
