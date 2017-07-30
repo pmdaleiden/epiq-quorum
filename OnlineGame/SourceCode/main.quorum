@@ -73,11 +73,10 @@ class Main is Game, CollisionListener2D, KeyboardListener
         target:SetCollidable(true)
         castle:Load("media/castle.jpg")
         ko:Load("media/kobad.jpg")
-        ko:SetPosition(150, 200)
         steve:Load("media/stevebad.jpg")
-        steve:SetPosition(250, 200)
         sina:Load("media/sinabad.jpg")
-        sina:SetPosition(300, 200)
+        sina:Scale(0.50)
+        
         
         Add(hero)
         Add(target)
@@ -98,8 +97,15 @@ class Main is Game, CollisionListener2D, KeyboardListener
             cumFloor = cumFloor + newFloorPiece:GetWidth() + pitWidth
             Add(newFloorPiece)
             ground:AddToEnd(newFloorPiece)
+            if ground:GetSize() = 3
+                ko:SetPosition(cumFloor - pitWidth - ko:GetWidth(), 100)
+            end
+            if ground:GetSize() = 6
+                steve:SetPosition(cumFloor - pitWidth - steve:GetWidth(), 100)
+            end
         end
         castle:SetPosition(cumFloor - pitWidth - castle:GetWidth(), 100)
+        sina:SetPosition(castle:GetX() - sina:GetWidth(), 100)
         
 
         //winning music: http://www.bensound.com/royalty-free-music/track/badass
@@ -202,5 +208,8 @@ class Main is Game, CollisionListener2D, KeyboardListener
             end
         end
         castle:SetX(castle:GetX() - seconds * groundSpeed)
+        sina:SetX(sina:GetX() - seconds * groundSpeed)
+        ko:SetX(ko:GetX() - seconds * groundSpeed)
+        steve:SetX(steve:GetX() - seconds * groundSpeed)
     end
 end
