@@ -34,7 +34,8 @@ class Main is Game, CollisionListener2D, KeyboardListener
     
     boolean inJump = false
 
-    Audio audio
+    Audio music
+    Audio jump
 
     action Main
         StartGame()
@@ -54,9 +55,11 @@ class Main is Game, CollisionListener2D, KeyboardListener
 
         //A little adorable royalty free music piece available 
         //here: http://www.bensound.com/royalty-free-music/track/cute
-        audio:Load("media/bensound-cute.ogg")
-        audio:EnableLooping()
-        audio:Play()
+        music:Load("media/bensound-cute.ogg")
+        music:EnableLooping()
+        music:Play()
+
+        jump:Load("media/fart.ogg")
     end
 
     action BeginCollision(CollisionEvent2D e)
