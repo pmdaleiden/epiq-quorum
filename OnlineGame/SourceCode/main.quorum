@@ -25,23 +25,25 @@ class Main is Game, CollisionListener2D, KeyboardListener
     integer score = 0
     integer circleRadius = 10
     integer targetSize = 30
-    integer jumpSpeed = 50
+    integer jumpSpeed = 150
 
     number time = 0
     number cumTime = 0
-    number jumpTime = 1.0
+    number jumpTime = 0.75
     number cumJumpTime = 0
     
     boolean inJump = false
 
-    Audio audio
+    Audio music
+    Audio jump
 
     action Main
         StartGame()
     end
 
     action CreateGame
-        circle:LoadFilledCircle(circleRadius)
+        circle:Load("media/Caffeine.png")
+        circle:SetPosition(0, 100)
         target:LoadFilledRectangle(targetSize, targetSize, c:Red())
         target:SetPosition(400, 300)
         circle:SetCollidable(true)
@@ -54,9 +56,12 @@ class Main is Game, CollisionListener2D, KeyboardListener
 
         //A little adorable royalty free music piece available 
         //here: http://www.bensound.com/royalty-free-music/track/cute
-        audio:Load("media/bensound-cute.ogg")
-        audio:EnableLooping()
-        audio:Play()
+        music:Load("media/bensound-cute.ogg")
+        music:SetVolume(0.5)
+        music:EnableLooping()
+        music:Play()
+
+        jump:Load("media/fart.ogg")
     end
 
     action BeginCollision(CollisionEvent2D e)
@@ -69,6 +74,7 @@ class Main is Game, CollisionListener2D, KeyboardListener
         if event:keyCode = event:SPACE
             inJump = true
             cumJumpTime = 0
+            jump:Play()
         end
     end
 
@@ -103,13 +109,6 @@ class Main is Game, CollisionListener2D, KeyboardListener
             if x < 0
                 x = 0
             end
-        elseif monitor:IsKeyPressed(keys:UP)
-            if inJump = false
-                cumJumpTime = 0
-                inJump = true
-            end
-        elseif monitor:IsKeyPressed(keys:DOWN)
-            
         elseif monitor:IsKeyPressed(keys:EQUALS)
             if targetSpeed > 0
                 targetSpeed = targetSpeed + 20
