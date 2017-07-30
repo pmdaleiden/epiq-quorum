@@ -9,10 +9,13 @@ use Libraries.Interface.Events.CollisionEvent2D
 use Libraries.Compute.Math
 use Libraries.Interface.Events.KeyboardListener
 use Libraries.Sound.Audio
+use Libraries.Containers.Array
+use Libraries.Containers.Iterator
 
 class Main is Game, CollisionListener2D, KeyboardListener
-    Drawable circle
+    Drawable hero
     Drawable target
+    Array<Drawable> ground
     Color c
     InputMonitor monitor
     KeyboardEvent keys
@@ -23,9 +26,14 @@ class Main is Game, CollisionListener2D, KeyboardListener
     integer xSpeed = 100
     integer ySpeed = 100
     integer score = 0
-    integer circleRadius = 10
+    integer heroRadius = 10
     integer targetSize = 30
     integer jumpSpeed = 150
+    integer groundHeight = 100
+    integer groundWidthMin = 100
+    integer groundWidthMax = 400
+    integer groundSpeed = 50
+    integer pitWidth = 60
 
     number time = 0
     number cumTime = 0
@@ -41,17 +49,28 @@ class Main is Game, CollisionListener2D, KeyboardListener
     end
 
     action CreateGame
-        circle:LoadFilledCircle(circleRadius)
-        circle:SetPosition(0, 100)
+        hero:LoadFilledCircle(heroRadius)
+        hero:SetPosition(0, 100)
         target:LoadFilledRectangle(targetSize, targetSize, c:Red())
         target:SetPosition(400, 300)
-        circle:SetCollidable(true)
+        hero:SetCollidable(true)
         target:SetCollidable(true)
-        Add(circle)
+        Add(hero)
         Add(target)
         time = r:RandomNumber()
         AddCollisionListener(me)
         AddKeyboardListener(me)
+
+        number cumFloor = 0
+        repeat 10 times
+            Drawable newFloorPiece
+            newFloorPiece:LoadFilledRectangle(r:RandomIntegerBetween(groundWidthMin, groundWidthMax), 100, c:Green())
+            newFloorPiece:SetCollidable(true)
+            newFloorPiece:SetPosition(cumFloor, 0)            
+            cumFloor = cumFloor + newFloorPiece:GetWidth() + pitWidth
+            Add(newFloorPiece)
+            ground:AddToEnd(newFloorPiece)
+        end
 
         //A little adorable royalty free music piece available 
         //here: http://www.bensound.com/royalty-free-music/track/cute
@@ -61,15 +80,18 @@ class Main is Game, CollisionListener2D, KeyboardListener
     end
 
     action BeginCollision(CollisionEvent2D e)
-        score = score + 1
-        output "Score: " + score
-        circle:SetPosition(0,0)
+        inJump = false
     end
 
     action PressedKey(KeyboardEvent event)
         if event:keyCode = event:SPACE
-            inJump = true
-            cumJumpTime = 0
+            if inJump = false
+                inJump = true
+                cumJumpTime = 0
+                if hero:GetX() < groundHeight
+                    output "you die"
+                end
+            end
         end
     end
 
@@ -91,12 +113,11 @@ class Main is Game, CollisionListener2D, KeyboardListener
         end
         target:SetX(newX)
         target:SetY(newY)
-        number x = circle:GetX()
-        number y = circle:GetY()
+        number x = hero:GetX()
         if monitor:IsKeyPressed(keys:RIGHT)
             x = x + seconds * speed
-            if x > (800 - circleRadius * 2)
-                x = 800 - circleRadius * 2
+            if x > (800 - heroRadius * 2)
+                x = 800 - heroRadius * 2
             end
         elseif monitor:IsKeyPressed(keys:LEFT)
             x = x - seconds * speed
@@ -104,12 +125,14 @@ class Main is Game, CollisionListener2D, KeyboardListener
                 x = 0
             end
         elseif monitor:IsKeyPressed(keys:EQUALS)
+            groundSpeed = groundSpeed + 20
             if targetSpeed > 0
                 targetSpeed = targetSpeed + 20
             else
                 targetSpeed = targetSpeed - 20
             end
         elseif monitor:IsKeyPressed(keys:MINUS)
+            groundSpeed = groundSpeed - 20
             if targetSpeed = 0
                 targetSpeed = 0
             elseif targetSpeed > 0
@@ -118,22 +141,28 @@ class Main is Game, CollisionListener2D, KeyboardListener
                 targetSpeed = targetSpeed + 20
             end
         end
+        hero:SetX(x)
+
         if inJump
             cumJumpTime = cumJumpTime + seconds
             if cumJumpTime < jumpTime * 0.40
-            //move y up
-                y = circle:GetY() + seconds * jumpSpeed
+                hero:SetY(hero:GetY() + seconds * jumpSpeed)
             elseif cumJumpTime < jumpTime * 0.60
             //pause at the top of the jump
-            elseif cumJumpTime < jumpTime
-            // move y down
-                y = circle:GetY() - seconds * jumpSpeed
             else
-            // jump ended
-                inJump = false
+                hero:SetY(hero:GetY() - seconds * jumpSpeed)
             end
         end
-        circle:SetX(x)
-        circle:SetY(y)
+        Iterator<Drawable> it = ground:GetIterator()
+        repeat while it:HasNext()
+            Drawable floorPiece = it:Next()
+            number itemX = floorPiece:GetX()
+            if itemX + floorPiece:GetWidth() < 0
+                ground:RemoveFromFront()
+            else
+                itemX = itemX - seconds * groundSpeed
+                floorPiece:SetX(itemX)
+            end
+        end
     end
 end
