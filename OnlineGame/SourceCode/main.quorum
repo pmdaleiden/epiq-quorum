@@ -55,6 +55,16 @@ class Main is Game, CollisionListener2D, KeyboardListener
     end
 
     action CreateGame
+
+        i = 1
+        repeat 10 times
+            Drawable coin
+            coin:Load("media/QCoin.png")
+            coin:SetPosition(i * 70, 200)
+            coin:SetCollidable(true)
+            coins:Add(coin)
+            Add(coin)
+        end
         hero:LoadFilledCircle(heroRadius)
         hero:SetPosition(0, 100)
         target:LoadFilledRectangle(targetSize, targetSize, c:Red())
