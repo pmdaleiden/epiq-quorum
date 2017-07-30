@@ -1,1 +1,33 @@
-output "Jedis rule"
+use Libraries.Game.Game
+use Libraries.Game.Graphics.Drawable
+use Libraries.Game.InputMonitor
+use Libraries.Interface.Events.KeyboardEvent
+
+class Main is Game
+    Drawable box
+    InputMonitor monitor
+    KeyboardEvent keys
+    integer speed = 200
+
+
+    action Main
+        StartGame()
+    end
+
+    action CreateGame
+        box:Load("sina.jpeg")
+        Add(box)
+    end
+
+    action Update(number seconds)
+        if monitor:IsKeyPressed(keys:RIGHT)
+            box:SetX(box:GetX() + seconds * speed)
+        elseif monitor:IsKeyPressed(keys:LEFT)
+            box:SetX(box:GetX() - seconds * speed)
+        elseif monitor:IsKeyPressed(keys:UP)
+            box:SetY(box:GetY() + seconds * speed)
+        elseif monitor:IsKeyPressed(keys:DOWN)
+            box:SetY(box:GetY() - seconds * speed)
+        end
+    end
+end
