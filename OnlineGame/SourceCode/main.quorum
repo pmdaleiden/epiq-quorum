@@ -14,6 +14,7 @@ use Libraries.Containers.Iterator
 use Libraries.Interface.Item2D
 
 class Main is Game, CollisionListener2D, KeyboardListener
+    // Object Declarations
     Drawable hero
     Drawable target
     Drawable castle
@@ -28,33 +29,38 @@ class Main is Game, CollisionListener2D, KeyboardListener
     InputMonitor monitor
     KeyboardEvent keys
     Random r
-
-    integer speed = 200
-    integer targetSpeed = 100
-    integer xSpeed = 100
-    integer ySpeed = 100
-    integer score = 0
-    integer heroRadius = 10
-    integer targetSize = 30
-    integer jumpSpeed = 150
-    integer groundHeight = 100
-    integer groundWidthMin = 150
-    integer groundWidthMax = 400
-    integer groundSpeed = 50
-    integer counter = 0
-    integer pitWidth = 100
-
-    number time = 0
-    number cumTime = 0
-    number jumpTime = 0.75
-    number cumJumpTime = 0
-    
-    boolean inJump = false
-
     Audio music
     Audio jump
     Audio cash
     Audio fart
+    Audio lose
+
+    // Variable Declarations
+    integer score = 0
+    number time = 0
+    number cumTime = 0
+    number cumJumpTime = 0
+    number koScale = 1.0
+    boolean inJump = false
+    boolean inMotion = true
+    boolean playing = true
+    boolean onGround = true
+
+    // Game Settings
+    integer heroSpeed = 200
+    integer targetSpeed = 100
+    integer xSpeed = 100
+    integer ySpeed = 100
+    integer targetSize = 30
+    integer jumpSpeed = 150
+    integer groundHeight = 100
+    integer groundWidthMin = 300
+    integer groundWidthMax = 600
+    integer groundSpeed = 50
+    integer pitWidth = 100
+    integer birdSpeed = 50
+    integer birdCrapSpeed = 400
+    number jumpTime = 0.75
 
     action Main
         StartGame()
@@ -62,48 +68,41 @@ class Main is Game, CollisionListener2D, KeyboardListener
 
     action CreateGame
         hero:SetName("hero")
-        i = 1
-        repeat 10 times
-            Drawable coin
-            coin:Load("media/QCoin.png")
-            coin:SetPosition(i * 150, 200)
-            coin:SetCollidable(true)
-            coins:Add(coin)
-            coin:SetName("coin")
-            Add(coin)
-            i = i + 1
-        end
         hero:Load("media/Caffeine.png")
         hero:SetPosition(0, 100)
         hero:Scale(0.3)
+        hero:SetCollidable(true)
+        Add(hero)
+
         target:LoadFilledRectangle(targetSize, targetSize, c:Red())
         target:SetPosition(400, 300)
-        hero:SetCollidable(true)
         target:SetCollidable(true)
+        Add(target)
+
         castle:Load("media/castle.jpg")
+        Add(castle)
         ko:Load("media/kobad.jpg")
+        ko:SetName("ko")
+        Add(ko)
         steve:Load("media/stevebad.jpg")
+        steve:SetName("steve")
+        Add(steve)
         sina:Load("media/sinabad.jpg")
-        sina:SetPosition(300, 200)
+        sina:SetName("sina")
+        sina:Scale(0.5)
+        Add(sina)
         
         bird:LoadFilledTriangle(0,0,20,60,40,0)
         bird:SetPosition(0, 550)
         bird:Rotate(90)
-
+        bird:SetCollidable(true)
+        Add(bird)
         number arrayNamesCounter = 0
 
         toxicBirdCrap:LoadFilledTriangle(0,0,10,10, 20, 0, c:CustomColor(1, 0.5, 0.5, 1))
         toxicBirdCrap:SetPosition(0, 100000)
         Add(toxicBirdCrap)
 
-        bird:SetCollidable(true)
-        sina:Scale(0.5)
-        Add(hero)
-        Add(target)
-        Add(castle)
-        Add(ko)
-        Add(steve)
-        Add(sina)
         time = r:RandomNumber()
         AddCollisionListener(me)
         AddKeyboardListener(me)
@@ -116,6 +115,7 @@ class Main is Game, CollisionListener2D, KeyboardListener
             else
                 newFloorPiece:LoadFilledRectangle(r:RandomIntegerBetween(groundWidthMin, groundWidthMax), 100, c:Green())
             end
+            newFloorPiece:SetName("ground")
             newFloorPiece:SetCollidable(true)
             newFloorPiece:SetPosition(cumFloor, 0)            
             cumFloor = cumFloor + newFloorPiece:GetWidth() + pitWidth
@@ -127,7 +127,15 @@ class Main is Game, CollisionListener2D, KeyboardListener
             if ground:GetSize() = 6
                 steve:SetPosition(cumFloor - pitWidth - steve:GetWidth(), 100)
             end
+            Drawable coin
+            coin:Load("media/QCoin.png")
+            coin:SetName("coin")
+            coin:SetCollidable(true)
+            coin:SetPosition(cumFloor - 500, 150)
+            Add(coin)
+            coins:AddToEnd(coin)
         end
+
         castle:SetPosition(cumFloor - pitWidth - castle:GetWidth(), 100)
         sina:SetPosition(castle:GetX() - sina:GetWidth(), 100)
         
@@ -144,16 +152,42 @@ class Main is Game, CollisionListener2D, KeyboardListener
         music:Play()
         cash:Load("media/cash.ogg")
         jump:Load("media/fart.ogg")
+        lose:Load("media/fart.ogg")
+    end
+
+    action CoinCollision(Item2D coin)
+        cash:Play()
+        coin:Hide()
     end
 
     action BeginCollision(CollisionEvent2D e)
-        inJump = false
-
         Item2D a = e:GetItemA()
         Item2D b = e:GetItemB()
-        if a:GetName() = "hero" and b:GetName() = "coin" or
-           a:GetName() = "coin" and b:GetName() = "hero"
-           cash:Play()
+        if a:GetName() = "hero" and b:GetName() = "coin"
+            CoinCollision(b)
+        elseif a:GetName() = "coin" and b:GetName() = "hero"
+            CoinCollision(a)
+        elseif a:GetName() = "hero" and b:GetName() = "ground" or
+            a:GetName() = "ground" and b:GetName() = "hero"
+            if hero:GetHeight() > groundHeight
+                inJump = false
+                onGround = true
+            else
+                Lose()
+            end
+        elseif a:GetName() = "hero" and b:GetName() = "ko" or a:GetName() = "ko" and b:GetName() = "hero"
+            koScale = 0.99
+        end
+    end
+
+    action FinishCollision(CollisionEvent2D e)
+        Item2D a = e:GetItemA()
+        Item2D b = e:GetItemB()
+        output "finish"
+        if (a:GetName() = "hero" and b:GetName() = "ground") or (a:GetName() = "ground" and b:GetName() = "hero")
+            if not inJump
+                onGround = false
+            end
         end
     end
 
@@ -162,93 +196,128 @@ class Main is Game, CollisionListener2D, KeyboardListener
             if inJump = false
                 inJump = true
                 cumJumpTime = 0
-                if hero:GetX() < groundHeight
-                    output "you die"
-                end
                 jump:Play()
             end
+        elseif event:keyCode = event:P
+            inMotion = not inMotion
+        elseif event:keyCode = event:Q
+            Exit()
         end
     end
 
-    action Update(number seconds)
-        cumTime = cumTime + seconds
-        if cumTime > time
-            cumTime = 0
-            time = r:RandomNumber()
-            xSpeed = r:RandomIntegerBetween(-targetSpeed, targetSpeed)
-            ySpeed = r:RandomIntegerBetween(-targetSpeed, targetSpeed)
-        end
-        number newX = target:GetX() + seconds * xSpeed
-        number newY = target:GetY() + seconds * ySpeed
-        if newX < targetSize or newX > 800 - targetSize
-            xSpeed = -xSpeed
-        end
-        if newY < targetSize or newY > 600 - targetSize
-            ySpeed = -ySpeed
-        end
-        target:SetX(newX)
-        target:SetY(newY)
-        number x = hero:GetX()
-        if monitor:IsKeyPressed(keys:RIGHT)
-            x = x + seconds * speed
-            if x > (800 - heroRadius * 2)
-                x = 800 - heroRadius * 2
-            end
-        elseif monitor:IsKeyPressed(keys:LEFT)
-            x = x - seconds * speed
-            if x < 0
-                x = 0
-            end
-        elseif monitor:IsKeyPressed(keys:EQUALS)
-            groundSpeed = groundSpeed + 20
-            if targetSpeed > 0
-                targetSpeed = targetSpeed + 20
-            else
-                targetSpeed = targetSpeed - 20
-            end
-        elseif monitor:IsKeyPressed(keys:MINUS)
-            groundSpeed = groundSpeed - 20
-            if targetSpeed = 0
-                targetSpeed = 0
-            elseif targetSpeed > 0
-                targetSpeed = targetSpeed - 20
-            else
-                targetSpeed = targetSpeed + 20
-            end
-        end
-        hero:SetX(x)
+    action Lose()
+        inMotion = false
+        playing = false
+        lose:Play()
+        output "You lose"
+    end
 
-        if inJump
-            cumJumpTime = cumJumpTime + seconds
-            if cumJumpTime < jumpTime * 0.40
-                hero:SetY(hero:GetY() + seconds * jumpSpeed)
-            elseif cumJumpTime < jumpTime * 0.60
-            //pause at the top of the jump
-            else
+    action Update(number seconds)
+        if hero:GetY() < 0 and playing = true
+            Lose()
+        end
+        if inMotion
+            cumTime = cumTime + seconds
+            if cumTime > time
+                cumTime = 0
+                time = r:RandomNumber()
+                xSpeed = r:RandomIntegerBetween(-targetSpeed, targetSpeed)
+                ySpeed = r:RandomIntegerBetween(-targetSpeed, targetSpeed)
+            end
+            number newX = target:GetX() + seconds * xSpeed
+            number newY = target:GetY() + seconds * ySpeed
+            if newX < targetSize or newX > 800 - targetSize
+                xSpeed = -xSpeed
+            end
+            if newY < targetSize or newY > 600 - targetSize
+                ySpeed = -ySpeed
+            end
+            target:SetX(newX)
+            target:SetY(newY)
+            number x = hero:GetX()
+            if monitor:IsKeyPressed(keys:RIGHT)
+                x = x + seconds * heroSpeed
+                if x > (800 - hero:GetWidth() * 2)
+                    x = 800 - hero:GetWidth() * 2
+                end
+            elseif monitor:IsKeyPressed(keys:LEFT)
+                x = x - seconds * heroSpeed
+                if x < 0
+                    x = 0
+                end
+            elseif monitor:IsKeyPressed(keys:EQUALS)
+                groundSpeed = groundSpeed + 20
+                if targetSpeed > 0
+                    targetSpeed = targetSpeed + 20
+                else
+                    targetSpeed = targetSpeed - 20
+                end
+            elseif monitor:IsKeyPressed(keys:MINUS)
+                groundSpeed = groundSpeed - 20
+                if targetSpeed = 0
+                    targetSpeed = 0
+                elseif targetSpeed > 0
+                    targetSpeed = targetSpeed - 20
+                else
+                    targetSpeed = targetSpeed + 20
+                end
+            end
+            hero:SetX(x)
+
+            if inJump
+                cumJumpTime = cumJumpTime + seconds
+                if cumJumpTime < jumpTime * 0.40
+                    hero:SetY(hero:GetY() + seconds * jumpSpeed)
+                elseif cumJumpTime < jumpTime * 0.60
+                //pause at the top of the jump
+                else
+                    hero:SetY(hero:GetY() - seconds * jumpSpeed)
+                end
+            end
+
+            if onGround = false
                 hero:SetY(hero:GetY() - seconds * jumpSpeed)
             end
-        end
 
-        number newBirdX = bird:GetX() + 50 * seconds
-        bird:SetX(newBirdX)
+            number newBirdX = bird:GetX() + birdSpeed * seconds
+            bird:SetX(newBirdX)
 
-        number newBirdCrapY = toxicBirdCrap:GetY() - 400 * seconds
-        toxicBirdCrap:SetY(newBirdCrapY)
+            number newBirdCrapY = toxicBirdCrap:GetY() - birdCrapSpeed * seconds
+            toxicBirdCrap:SetY(newBirdCrapY)
 
-        Iterator<Drawable> it = ground:GetIterator()
-        repeat while it:HasNext()
-            Drawable floorPiece = it:Next()
-            number itemX = floorPiece:GetX()
-            if itemX + floorPiece:GetWidth() < 0
-                ground:RemoveFromFront()
-            else
-                itemX = itemX - seconds * groundSpeed
-                floorPiece:SetX(itemX)
+            Iterator<Drawable> it = ground:GetIterator()
+            repeat while it:HasNext()
+                Drawable floorPiece = it:Next()
+                number itemX = floorPiece:GetX()
+                if itemX + floorPiece:GetWidth() < 0
+                    ground:RemoveFromFront()
+                else
+                    itemX = itemX - seconds * groundSpeed
+                    floorPiece:SetX(itemX)
+                end
             end
+            Iterator<Drawable> coinIt = coins:GetIterator()
+            repeat while coinIt:HasNext()
+                Drawable coin = coinIt:Next()
+                number itemX = coin:GetX()
+                if itemX + coin:GetWidth() < 0
+                    coins:RemoveFromFront()
+                else
+                    itemX = itemX - seconds * groundSpeed
+                    coin:SetX(itemX)
+                end
+            end
+
+            if ko:GetX() > 0 - ko:GetWidth()
+                ko:SetX(ko:GetX() - seconds * groundSpeed)
+                if koScale < 1.0 and koScale > 0
+                    koScale = koScale - 0.01
+                    ko:Scale(koScale)
+                end
+            end
+            castle:SetX(castle:GetX() - seconds * groundSpeed)
+            sina:SetX(sina:GetX() - seconds * groundSpeed)
+            steve:SetX(steve:GetX() - seconds * groundSpeed)
         end
-        castle:SetX(castle:GetX() - seconds * groundSpeed)
-        sina:SetX(sina:GetX() - seconds * groundSpeed)
-        ko:SetX(ko:GetX() - seconds * groundSpeed)
-        steve:SetX(steve:GetX() - seconds * groundSpeed)
     end
 end
